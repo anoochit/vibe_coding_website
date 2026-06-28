@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIBE CODING NO, LIMITED.</title>
+    <meta name="description" content="Build software at the speed of thought. AI-native development consulting and rapid application engineering.">
+    <!-- Load the Inter font to serve as a high-fidelity condensed D-DIN alternative -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* DESIGN SYSTEM TOKENS & VARIABLES */
+        :root {
+            --colors-canvas-night: #000000;
+            --colors-canvas-night-soft: #0a0a0a;
+            --colors-hairline-on-dark: #3a3a3f;
+            --colors-on-primary: #ffffff;
+            --colors-on-primary-mute: #f0f0fa;
+            
+            --spacing-xxs: 4px;
+            --spacing-xs: 8px;
+            --spacing-sm: 12px;
+            --spacing-md: 16px;
+            --spacing-lg: 18px;
+            --spacing-xl: 24px;
+            --spacing-xxl: 32px;
+            --spacing-huge: 48px;
+            
+            --rounded-xs: 4px;
+            --rounded-sm: 8px;
+            --rounded-md: 16px;
+            --rounded-pill: 32px;
+        }
+
+        /* RESET & BASE STYLES */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            background-color: var(--colors-canvas-night);
+            color: var(--colors-on-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 16px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow: hidden; /* Scroll controlled by container */
+        }
+
+        /* VERTICAL SCROLL SNAP CONTAINER */
+        .scroll-container {
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+            height: 100vh;
+            scroll-behavior: smooth;
+        }
+
+        /* NAVIGATION BAR OVERLAY */
+        .nav-bar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--spacing-xxl);
+            background-color: transparent;
+            z-index: 100;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-bar-overlay.scrolled {
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--colors-hairline-on-dark);
+        }
+
+        .nav-logo {
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--colors-on-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--spacing-xxl);
+        }
+
+        .nav-link {
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 1.17px;
+            text-transform: uppercase;
+            color: var(--colors-on-primary-mute);
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--colors-on-primary);
+        }
+
+        /* MOBILE MENU BUTTON */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 24px;
+            height: 16px;
+            position: relative;
+            z-index: 200;
+        }
+
+        .mobile-menu-toggle span {
+            display: block;
+            width: 100%;
+            height: 2px;
+            background-color: var(--colors-on-primary);
+            position: absolute;
+            transition: transform 0.3s ease, top 0.3s ease, bottom 0.3s ease;
+        }
+
+        .mobile-menu-toggle span:first-child {
+            top: 0;
+        }
+
+        .mobile-menu-toggle span:nth-child(2) {
+            top: 7px;
+        }
+
+        .mobile-menu-toggle span:last-child {
+            bottom: 0;
+        }
+
+        .mobile-menu-toggle.active span:first-child {
+            transform: rotate(45deg);
+            top: 7px;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-toggle.active span:last-child {
+            transform: rotate(-45deg);
+            bottom: 7px;
+        }
+
+        /* FULL-BLEED PHOTO BANDS */
+        .section-band {
+            scroll-snap-align: start;
+            height: 100vh;
+            width: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* BACKGROUND IMAGE WITH PREMIUM DARK GRADING */
+        .section-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: 1;
+            filter: brightness(0.3) contrast(1.05);
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .section-band:hover .section-background {
+            transform: scale(1.02);
+        }
+
+        /* TEXT LAYER */
+        .section-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 var(--spacing-xl);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            height: 100%;
+        }
+
+        /* TYPOGRAPHY hierarchy from DESIGN.md */
+        .eyebrow-micro {
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 2.0;
+            letter-spacing: 0.96px;
+            text-transform: uppercase;
+            color: var(--colors-on-primary-mute);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .display-xxl {
+            font-size: 80px;
+            font-weight: 700;
+            line-height: 0.95;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+            color: var(--colors-on-primary);
+            margin-bottom: var(--spacing-xl);
+            max-width: 900px;
+        }
+
+        .display-xl {
+            font-size: 60px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--colors-on-primary);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .body-lead {
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.7;
+            letter-spacing: 0.32px;
+            color: var(--colors-on-primary-mute);
+            max-width: 600px;
+            margin-bottom: var(--spacing-huge);
+        }
+
+        /* SIGNATURE BUTTON TREATMENT: button-ghost-on-dark */
+        .button-ghost-on-dark {
+            background-color: transparent;
+            border: 1px solid var(--colors-on-primary);
+            color: var(--colors-on-primary);
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 0.94;
+            letter-spacing: 1.17px;
+            text-transform: uppercase;
+            padding: 18px var(--spacing-xl);
+            border-radius: var(--rounded-pill);
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+
+        .button-ghost-on-dark:hover {
+            background-color: var(--colors-on-primary);
+            color: var(--colors-canvas-night);
+        }
+
+        /* GRID / CARD STYLES ON BACKGROUND PANEL */
+        .content-card-overlay {
+            background-color: var(--colors-canvas-night-soft);
+            border: 1px solid var(--colors-hairline-on-dark);
+            border-radius: var(--rounded-sm);
+            padding: var(--spacing-xl);
+            width: 100%;
+            max-width: 1000px;
+            margin-top: var(--spacing-xl);
+        }
+
+        .services-interactive-wrapper {
+            display: flex;
+            width: 100%;
+            gap: var(--spacing-huge);
+            margin-top: var(--spacing-lg);
+        }
+
+        .services-nav {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            width: 250px;
+            flex-shrink: 0;
+            border-right: 1px solid var(--colors-hairline-on-dark);
+            padding-right: var(--spacing-xl);
+        }
+
+        .services-nav-btn {
+            background: none;
+            border: none;
+            color: var(--colors-on-primary-mute);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.17px;
+            text-align: left;
+            padding: var(--spacing-sm) 0;
+            cursor: pointer;
+            transition: color 0.2s ease, padding-left 0.2s ease;
+        }
+
+        .services-nav-btn.active {
+            color: var(--colors-on-primary);
+            padding-left: var(--spacing-xs);
+        }
+
+        .services-display-panel {
+            flex-grow: 1;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .service-content-block {
+            display: none;
+        }
+
+        .service-content-block.active {
+            display: block;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* EXPERTISE GRID SYSTEM */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: var(--spacing-xl);
+            width: 100%;
+            margin-top: var(--spacing-xl);
+        }
+
+        .tech-category-column {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .tech-category-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.96px;
+            text-transform: uppercase;
+            color: var(--colors-on-primary);
+            border-bottom: 1px solid var(--colors-hairline-on-dark);
+            padding-bottom: var(--spacing-xs);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .tech-list-item {
+            font-size: 13px;
+            color: var(--colors-on-primary-mute);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ADVANTAGES STAT GRID */
+        .advantages-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-xl);
+            width: 100%;
+            margin-top: var(--spacing-xl);
+        }
+
+        .advantage-card {
+            border-left: 1px solid var(--colors-hairline-on-dark);
+            padding-left: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .advantage-stat {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--colors-on-primary);
+        }
+
+        .advantage-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.96px;
+            text-transform: uppercase;
+            color: var(--colors-on-primary);
+        }
+
+        .advantage-desc {
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--colors-on-primary-mute);
+        }
+
+        /* PORTFOLIO ACCORDION OR SELECTOR */
+        .portfolio-list {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin-top: var(--spacing-xl);
+            gap: var(--spacing-md);
+        }
+
+        .portfolio-item {
+            border-bottom: 1px solid var(--colors-hairline-on-dark);
+            padding-bottom: var(--spacing-md);
+            cursor: pointer;
+            transition: padding-left 0.2s ease;
+        }
+
+        .portfolio-item:hover {
+            padding-left: var(--spacing-sm);
+        }
+
+        .portfolio-title {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--colors-on-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .portfolio-desc {
+            font-size: 14px;
+            color: var(--colors-on-primary-mute);
+            margin-top: var(--spacing-xs);
+            max-width: 800px;
+        }
+
+        /* FOOTER / CONTACT SECTION */
+        .footer-dark {
+            background-color: var(--colors-canvas-night);
+            width: 100%;
+            border-top: 1px solid var(--colors-hairline-on-dark);
+            padding: var(--spacing-huge) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
+        }
+
+        .footer-columns {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: var(--spacing-huge);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-brand-col {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .footer-title {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--colors-on-primary);
+        }
+
+        .footer-link-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .footer-link {
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 0.96px;
+            text-transform: uppercase;
+            color: var(--colors-on-primary-mute);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--colors-on-primary);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: var(--spacing-huge) auto 0 auto;
+            border-top: 1px solid var(--colors-hairline-on-dark);
+            padding-top: var(--spacing-xl);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--colors-on-primary-mute);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* RESPONSIVE DESIGN - COLLAPSING STRATEGY */
+        @media (max-width: 1280px) {
+            .display-xxl { font-size: 60px; }
+            .display-xl { font-size: 48px; }
+        }
+
+        @media (max-width: 960px) {
+            .display-xxl { font-size: 48px; }
+            .display-xl { font-size: 40px; }
+            
+            .services-interactive-wrapper {
+                flex-direction: column;
+                gap: var(--spacing-xl);
+            }
+            
+            .services-nav {
+                width: 100%;
+                flex-direction: row;
+                overflow-x: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--colors-hairline-on-dark);
+                padding-right: 0;
+                padding-bottom: var(--spacing-sm);
+            }
+
+            .services-nav-btn {
+                white-space: nowrap;
+            }
+
+            .tech-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .advantages-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-columns {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-xl);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none; /* Hide standard nav on mobile */
+                position: fixed;
+                top: 80px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.95);
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: var(--spacing-xl);
+                z-index: 150;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .display-xxl { font-size: 40px; }
+            .display-xl { font-size: 32px; }
+
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .advantages-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tech-grid {
+                grid-template-columns: 1fr;
+            }
+            .nav-bar-overlay {
+                padding: 0 var(--spacing-md);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION OVERLAY -->
+    <header class="nav-bar-overlay" id="navbar">
+        <a href="#hero" class="nav-logo">VIBE CODING NO, LIMITED.</a>
+        <nav class="nav-links" id="navLinks">
+            <a class="nav-link" onclick="scrollToSection('hero')">HOME</a>
+            <a class="nav-link" onclick="scrollToSection('mission')">MISSION</a>
+            <a class="nav-link" onclick="scrollToSection('services')">SERVICES</a>
+            <a class="nav-link" onclick="scrollToSection('tech')">TECHNOLOGY</a>
+            <a class="nav-link" onclick="scrollToSection('advantages')">ADVANTAGES</a>
+            <a class="nav-link" onclick="scrollToSection('portfolio')">PORTFOLIO</a>
+            <a class="nav-link" onclick="scrollToSection('contact')">CONTACT</a>
+        </nav>
+        <button class="mobile-menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </header>
+
+    <!-- MAIN SNAP CONTAINER -->
+    <main class="scroll-container" id="scrollContainer">
+
+        <!-- 1. HERO BAND -->
+        <section class="section-band" id="hero">
+            <div class="section-background" style="background-image: url('https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?q=80&w=1920');"></div>
+            <div class="section-content">
+                <p class="eyebrow-micro">ESTABLISHED 2026</p>
+                <h1 class="display-xxl">BUILD SOFTWARE AT THE SPEED OF THOUGHT</h1>
+                <p class="body-lead">เปลี่ยนไอเดียให้กลายเป็นซอฟต์แวร์จริงด้วยพลังของ AI และ Vibe Coding โดยทีมผู้เชี่ยวชาญด้าน Agentic Software Engineering</p>
+                <button class="button-ghost-on-dark" onclick="scrollToSection('mission')">DISCOVER THE VISION</button>
+            </div>
+        </section>
+
+        <!-- 2. MISSION / VISION BAND -->
+        <section class="section-band" id="mission">
+            <div class="section-background" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920');"></div>
+            <div class="section-content">
+                <p class="eyebrow-micro">VISION AND MISSION</p>
+                <h2 class="display-xl">VIBE SMART. DON'T CODE HARD.</h2>
+                <p class="body-lead">เรานำแนวคิด Vibe Coding, AI-Assisted Development, และ Agentic Software Engineering มาผสานเข้าด้วยกัน เพื่อช่วยให้องค์กรสามารถสร้างผลิตภัณฑ์ดิจิทัลได้รวดเร็วขึ้น มีคุณภาพสูงขึ้น และลดต้นทุนการพัฒนาอย่างยั่งยืน</p>
+                
+                <div class="content-card-overlay">
+                    <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                        <div style="border-left: 2px solid var(--colors-on-primary); padding-left: var(--spacing-md);">
+                            <p style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.96px; margin-bottom: 4px;">HUMAN + AI COLLABORATION</p>
+                            <p style="font-size: 13px; color: var(--colors-on-primary-mute);">สร้างวัฒนธรรมการทำงานร่วมกันเพื่อให้เกิดประสิทธิภาพสูงสุดในทุกสายงานการผลิต</p>
+                        </div>
+                        <div style="border-left: 2px solid var(--colors-on-primary); padding-left: var(--spacing-md);">
+                            <p style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.96px; margin-bottom: 4px;">RAPID APPLICATION ECOSYSTEM</p>
+                            <p style="font-size: 13px; color: var(--colors-on-primary-mute);">ส่งมอบซอฟต์แวร์ที่รวดเร็ว ยืดหยุ่น และตอบสนองต่อธุรกิจได้ทันทีแบบไม่มีข้อจำกัด</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SERVICES BAND (INTERACTIVE) -->
+        <section class="section-band" id="services">
+            <div class="section-background" style="background-image: url('https://images.unsplash.com/photo-1507668077129-56e32842fceb?q=80&w=1920');"></div>
+            <div class="section-content">
+                <p class="eyebrow-micro">OUR CAPABILITIES</p>
+                <h2 class="display-xl">SYSTEM SERVICES</h2>
+                
+                <div class="content-card-overlay">
+                    <div class="services-interactive-wrapper">
+                        <!-- Left Navigation -->
+                        <div class="services-nav">
+                            <button class="services-nav-btn active" onclick="switchService(0)">Vibe Consulting</button>
+                            <button class="services-nav-btn" onclick="switchService(1)">AI Solutions</button>
+                            <button class="services-nav-btn" onclick="switchService(2)">Rapid Development</button>
+                            <button class="services-nav-btn" onclick="switchService(3)">AI Agents</button>
+                            <button class="services-nav-btn" onclick="switchService(4)">Training</button>
+                        </div>
+                        <!-- Right Display -->
+                        <div class="services-display-panel">
+                            <!-- Service 1 -->
+                            <div class="service-content-block active">
+                                <h3 style="font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--spacing-sm);">VIBE CODING CONSULTING</h3>
+                                <p style="font-size: 14px; color: var(--colors-on-primary-mute); margin-bottom: var(--spacing-md);">ให้คำปรึกษาเชิงลึกในการนำแนวคิด Vibe Coding และ AI Development Workflow ไปใช้อย่างมีประสิทธิภาพในโครงสร้างองค์กร</p>
+                                <ul style="list-style: none; font-size: 13px; color: var(--colors-on-primary); display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                    <li>• AI Development Strategy</li>
+                                    <li>• Workflow Design</li>
+                                    <li>• Prompt Engineering</li>
+                                    <li>• Team Enablement</li>
+                                </ul>
+                            </div>
+                            <!-- Service 2 -->
+                            <div class="service-content-block">
+                                <h3 style="font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--spacing-sm);">AI SOLUTION DEVELOPMENT</h3>
+                                <p style="font-size: 14px; color: var(--colors-on-primary-mute); margin-bottom: var(--spacing-md);">ออกแบบและพัฒนาระบบปัญญาประดิษฐ์ครบวงจร เพื่อตอบสนองความต้องการเฉพาะเจาะจงของโครงสร้างธุรกิจ</p>
+                                <ul style="list-style: none; font-size: 13px; color: var(--colors-on-primary); display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                    <li>• AI Customer Service</li>
+                                    <li>• Knowledge Assistant</li>
+                                    <li>• Document Intelligence</li>
+                                    <li>• Workflow Automation</li>
+                                </ul>
+                            </div>
+                            <!-- Service 3 -->
+                            <div class="service-content-block">
+                                <h3 style="font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--spacing-sm);">RAPID APPLICATION DEVELOPMENT</h3>
+                                <p style="font-size: 14px; color: var(--colors-on-primary-mute); margin-bottom: var(--spacing-md);">สร้างสรรค์เว็บแอปพลิเคชันและเครื่องมือภายในองค์กรด้วยกระบวนการ Vibe Coding 100% เพื่อความรวดเร็วและแม่นยำ</p>
+                                <ul style="list-style: none; font-size: 13px; color: var(--colors-on-primary); display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                    <li>• CRM and HR Lite Systems</li>
+                                    <li>• Custom Inventory Solutions</li>
+                                    <li>• Executive Dashboards</li>
+                                    <li>• Customer Portals</li>
+                                </ul>
+                            </div>
+                            <!-- Service 4 -->
+                            <div class="service-content-block">
+                                <h3 style="font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--spacing-sm);">AI AGENT DEVELOPMENT</h3>
+                                <p style="font-size: 14px; color: var(--colors-on-primary-mute); margin-bottom: var(--spacing-md);">ออกแบบสถาปัตยกรรม Multi-Agent และ autonomous workflow ที่ทำงานประสานกันโดยอัตโนมัติอย่างอัจฉริยะ</p>
+                                <ul style="list-style: none; font-size: 13px; color: var(--colors-on-primary); display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                    <li>• Multi-Agent Coordination</li>
+                                    <li>• MCP Standard Integration</li>
+                                    <li>• High-Performance RAG</li>
+                                    <li>• Autonomous Coding Support</li>
+                                </ul>
+                            </div>
+                            <!-- Service 5 -->
+                            <div class="service-content-block">
+                                <h3 style="font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--spacing-sm);">TRAINING AND WORKSHOP</h3>
+                                <p style="font-size: 14px; color: var(--colors-on-primary-mute); margin-bottom: var(--spacing-md);">หลักสูตรและวิชาการเฉพาะทางเพื่อเตรียมความพร้อมให้ทีมนักพัฒนาและบุคลากรในองค์กรยุค AI-Native</p>
+                                <ul style="list-style: none; font-size: 13px; color: var(--colors-on-primary); display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                    <li>• Introduction to Vibe Coding</li>
+                                    <li>• Advanced Prompt Engineering</li>
+                                    <li>• Building Specialized Agents</li>
+                                    <li>• Agent-Native System Design</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. TECHNOLOGY BAND -->
+        <section class="section-band" id="tech">
+            <div class="section-background" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920');"></div>
+            <div class="section-content">
+                <p class="eyebrow-micro">INFRASTRUCTURE ENGINE</p>
+                <h2 class="display-xl">THE TECH SYSTEM</h2>
+                
+                <div class="tech-grid">
+                    <!-- LLM -->
+                    <div class="tech-category-column">
+                        <h3 class="tech-category-title">AI AND LLM</h3>
+                        <div class="tech-list-item">OpenAI</div>
+                        <div class="tech-list-item">Gemini</div>
+                        <div class="tech-list-item">Claude</div>
+                        <div class="tech-list-item">Local LLM</div>
+                        <div class="tech-list-item">Ollama</div>
+                    </div>
+                    <!-- Framework -->
+                    <div class="tech-category-column">
+                        <h3 class="tech-category-title">AGENT FRAMEWORK</h3>
+                        <div class="tech-list-item">Pydantic AI</div>
+                        <div class="tech-list-item">LangGraph</div>
+                        <div class="tech-list-item">CrewAI</div>
+                        <div class="tech-list-item">AutoGen</div>
+                        <div class="tech-list-item">FastMCP</div>
+                    </div>
+                    <!-- Frontend -->
+                    <div class="tech-category-column">
+                        <h3 class="tech-category-title">FRONTEND</h3>
+                        <div class="tech-list-item">React</div>
+                        <div class="tech-list-item">Next.js</div>
+                        <div class="tech-list-item">Vue</div>
+                        <div class="tech-list-item">Angular</div>
+                        <div class="tech-list-item">Tailwind CSS</div>
+                    </div>
+                    <!-- Backend -->
+                    <div class="tech-category-column">
+                        <h3 class="tech-category-title">BACKEND</h3>
+                        <div class="tech-list-item">Python</div>
+                        <div class="tech-list-item">FastAPI</div>
+                        <div class="tech-list-item">Node.js</div>
+                        <div class="tech-list-item">NestJS</div>
+                        <div class="tech-list-item">Go</div>
+                    </div>
+                    <!-- Cloud -->
+                    <div class="tech-category-column">
+                        <h3 class="tech-category-title">CLOUD SYSTEM</h3>
+                        <div class="tech-list-item">Google Cloud</div>
+                        <div class="tech-list-item">AWS</div>
+                        <div class="tech-list-item">Azure</div>
+                        <div class="tech-list-item">Docker</div>
+                        <div class="tech-list-item">Kubernetes</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. ADVANTAGES BAND -->
+        <section class="section-band" id="advantages">
+            <div class="section-background" style="background-image: url('https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=1920');"></div>
+            <div class="section-content">
+                <p class="eyebrow-micro">OUR CRITICAL EDGE</p>
+                <h2 class="display-xl">WHY VIBE WITH US</h2>
+                
+                <div class="advantages-grid">
+                    <!-- Stat 1 -->
+                    <div class="advantage-card">
+                        <div class="advantage-stat">100%</div>
+                        <div class="advantage-title">VIBE WORKFLOW</div>
+                        <div class="advantage-desc">กระบวนการพัฒนาซอฟต์แวร์รูปแบบใหม่ ไร้รอยต่อ ตั้งแต่การออกแบบโครงสร้างจนส่งมอบระบบสำเร็จรูป</div>
+                    </div>
+                    <!-- Stat 2 -->
+                    <div class="advantage-stat-block advantage-card">
+                        <div class="advantage-stat">10X</div>
+                        <div class="advantage-title">FASTER SPEED</div>
+                        <div class="advantage-desc">การใช้ระบบ AI Agent อัจฉริยะช่วยร่นระยะเวลาขั้นตอนทางวิศวกรรมให้กระชับและรวดเร็วขึ้นเป็นทวีคูณ</div>
+                    </div>
+                    <!-- Stat 3 -->
+                    <div class="advantage-card">
+                        <div class="advantage-stat">HYBRID</div>
+                        <div class="advantage-title">HUMAN AND AI TEAM</div>
+                        <div class="advantage-desc">การผสานขีดความสามารถของนักพัฒนาระดับสูงร่วมกับกลไกปัญญาประดิษฐ์เพื่อคุณภาพงานที่สมบูรณ์แบบ</div>
+                    </div>
+                    <!-- Stat 4 -->
+                    <div class="advantage-card">
+                        <div class="advantage-stat">READY</div>
+                        <div class="advantage-title">PRODUCTION STANDARDS</div>
+                        <div class="advantage-desc">ระบบมีความมั่นคง ปลอดภัย มีเสถียรภาพ และได้รับการจัดเตรียมสถาปัตยกรรมอย่างถูกต้องตามหลักวิศวกรรม</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. PORTFOLIO BAND -->
+        <section class="section-band" id="portfolio">
+            <div class="section-background" style="background-image: url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1920');"></div>
+            <div class="section-content">
+                <p class="eyebrow-micro">SELECTED DEPLOYMENTS</p>
+                <h2 class="display-xl">PROVEN SOLUTIONS</h2>
+                
+                <div class="portfolio-list">
+                    <!-- Item 1 -->
+                    <div class="portfolio-item" onclick="scrollToSection('contact')">
+                        <div class="portfolio-title">
+                            <span>AI Helpdesk Platform</span>
+                            <span>&rarr;</span>
+                        </div>
+                        <div class="portfolio-desc">ระบบบริหารจัดการและช่วยเหลือลูกค้าด้วยโครงสร้าง AI Agent เต็มรูปแบบ รองรับปริมาณผู้เข้าใช้งานสูงถึง 50,000 คนต่อเดือนอย่างมีเสถียรภาพ</div>
+                    </div>
+                    <!-- Item 2 -->
+                    <div class="portfolio-item" onclick="scrollToSection('contact')">
+                        <div class="portfolio-title">
+                            <span>Smart Knowledge Hub</span>
+                            <span>&rarr;</span>
+                        </div>
+                        <div class="portfolio-desc">ระบบสืบค้นและจัดการความรู้ภายในระดับองค์กรขนาดใหญ่ ขับเคลื่อนด้วยสถาปัตยกรรม RAG และ Generative AI เพื่อการวิเคราะห์ข้อมูลเชิงลึก</div>
+                    </div>
+                    <!-- Item 3 -->
+                    <div class="portfolio-item" onclick="scrollToSection('contact')">
+                        <div class="portfolio-title">
+                            <span>AI Sales Assistant</span>
+                            <span>&rarr;</span>
+                        </div>
+                        <div class="portfolio-desc">ผู้ช่วยอัตโนมัติสำหรับทีมขาย ทำหน้าที่วิเคราะห์ความต้องการเชิงพฤติกรรมของลูกค้าและสร้างเอกสารข้อเสนอทางธุรกิจได้ทันที</div>
+                    </div>
+                    <!-- Item 4 -->
+                    <div class="portfolio-item" onclick="scrollToSection('contact')">
+                        <div class="portfolio-title">
+                            <span>Vibe ERP System</span>
+                            <span>&rarr;</span>
+                        </div>
+                        <div class="portfolio-desc">ระบบบริหารจัดการทรัพยากรเต็มรูปแบบสำหรับธุรกิจขนาดกลางและขนาดย่อม พัฒนาและส่งมอบระบบเสร็จสมบูรณ์ภายใน 6 สัปดาห์ผ่านนวัตกรรม Vibe Coding</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. CONTACT BAND & FOOTER -->
+        <section class="section-band" id="contact" style="align-items: stretch; justify-content: flex-end; flex-direction: column; height: auto; min-height: 100vh;">
+            <div class="section-background" style="background-image: url('https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?q=80&w=1920');"></div>
+            
+            <div class="section-content" style="justify-content: center; height: auto; min-height: 60vh; padding-top: 100px; padding-bottom: 50px;">
+                <p class="eyebrow-micro">JOIN THE REVOLUTION</p>
+                <h2 class="display-xl" style="margin-bottom: var(--spacing-sm);">START VIBING SMART</h2>
+                <p class="body-lead" style="margin-bottom: var(--spacing-xl);">พร้อมขับเคลื่อนและยกระดับระบบวิศวกรรมซอฟต์แวร์ในธุรกิจของคุณด้วยพลังแห่งอนาคต ติดต่อเราเพื่อปรึกษาแนวทางและร่วมกันสร้างสรรค์เทคโนโลยี</p>
+                <a href="mailto:hello@vibecodingno.com" class="button-ghost-on-dark">INITIATE CONSULTATION</a>
+            </div>
+
+            <!-- SITE FOOTER -->
+            <footer class="footer-dark">
+                <div class="footer-columns">
+                    <div class="footer-brand-col">
+                        <h3 class="footer-title">VIBE CODING NO, LIMITED.</h3>
+                        <p style="font-size: 13px; color: var(--colors-on-primary-mute); line-height: 1.6; max-width: 400px;">
+                            88 Vibe Tower, AI Innovation District, Bangkok 10110, Thailand
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="footer-title" style="font-size: 12px; margin-bottom: var(--spacing-md);">COMMUNICATION</h3>
+                        <div class="footer-link-list">
+                            <span class="footer-link">T: +66 (0)2-555-2025</span>
+                            <span class="footer-link">M: +66 (0)81-555-2025</span>
+                            <a href="mailto:hello@vibecodingno.com" class="footer-link">hello@vibecodingno.com</a>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="footer-title" style="font-size: 12px; margin-bottom: var(--spacing-md);">NETWORKS</h3>
+                        <div class="footer-link-list">
+                            <a href="http://www.vibecodingno.com" target="_blank" class="footer-link">www.vibecodingno.com</a>
+                            <a href="https://linkedin.com/company/vibecodingno" target="_blank" class="footer-link">LinkedIn</a>
+                            <a href="https://github.com/vibecodingno" target="_blank" class="footer-link">GitHub</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <span>&copy; 2026 VIBE CODING NO, LIMITED. ALL RIGHTS RESERVED.</span>
+                    <span>DON'T CODE HARD. VIBE SMART.</span>
+                </div>
+            </footer>
+        </section>
+
+    </main>
+
+    <script>
+        // Smooth scrolling using JavaScript offset to support snap coordinates
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+            // Close mobile menu if active
+            const navLinks = document.getElementById('navLinks');
+            const menuToggle = document.getElementById('menuToggle');
+            if (navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                menuToggle.classList.remove('active');
+            }
+        }
+
+        // Handle Active Header Link and Background Color on Scroll
+        const container = document.getElementById('scrollContainer');
+        const navbar = document.getElementById('navbar');
+        const sections = document.querySelectorAll('.section-band');
+        const navItems = document.querySelectorAll('.nav-link');
+
+        container.addEventListener('scroll', () => {
+            let currentSectionId = 'hero';
+            const scrollPos = container.scrollTop + 100;
+
+            sections.forEach(section => {
+                if (section.offsetTop <= scrollPos && (section.offsetTop + section.offsetHeight) > scrollPos) {
+                    currentSectionId = section.getAttribute('id');
+                }
+            });
+
+            // Toggle sticky opaque header when leaving hero
+            if (container.scrollTop > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile Menu Toggle logic
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Services Switcher logic
+        function switchService(index) {
+            const buttons = document.querySelectorAll('.services-nav-btn');
+            const blocks = document.querySelectorAll('.service-content-block');
+
+            buttons.forEach((btn, i) => {
+                if (i === index) {
+                    btn.classList.add('active');
+                    blocks[i].classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                    blocks[i].classList.remove('active');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
